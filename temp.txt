@@ -1,0 +1,3 @@
+
+Mkdisk -path=/home/archivos/fase1/Disco1.disk
+
