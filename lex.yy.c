@@ -609,13 +609,14 @@ static const flex_int16_t yy_rule_linenum[26] =
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "lex.l"
+/* %option c++ */
 #line 8 "lex.l"
   #include <stdio.h>
   #include <stdlib.h>
   #include "gram.tab.h"
   int linea=0;
-#line 618 "lex.yy.c"
 #line 619 "lex.yy.c"
+#line 620 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -898,7 +899,7 @@ YY_DECL
 #line 18 "lex.l"
 
 
-#line 902 "lex.yy.c"
+#line 903 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1110,7 +1111,7 @@ YY_RULE_SETUP
 #line 45 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1114 "lex.yy.c"
+#line 1115 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

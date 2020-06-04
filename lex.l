@@ -1,7 +1,7 @@
 %option noyywrap
 %option caseless
 %option debug
-
+/* %option c++ */
 
 
 %{

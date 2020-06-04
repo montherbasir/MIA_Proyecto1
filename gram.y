@@ -1,11 +1,10 @@
 
 %{
-
   #include <stdio.h>
   #include <stdlib.h>
   #include <math.h>
   #include <unistd.h>
-  #include <cstring>
+  #include <string.h>
 
   extern int yylex(void);
   extern char *yytext;
@@ -20,10 +19,9 @@
 %define parse.trace
 %define parse.error verbose
 %union{
-//se especifican los tipo de valores para los no terminales y lo terminales
+
 char* TEXT;
 }
-
 
 %token mkdisk
 %token rmdisk
@@ -54,7 +52,6 @@ char* TEXT;
 %type<TEXT> num
 %type<TEXT> rep
 
-
 %start L
 %%
 
@@ -65,14 +62,14 @@ L: %empty
   | mount NAME RUTA
   | mount RUTA NAME
   | unmount guion id igual identifier
-  | exec RUTA{ return -3;}
+  | exec RUTA { return -3;}
   | exit_ {return -1;}
   ;
 
 RUTA : guion path igual RU
     ;
 
-RU: cadena {}
+RU: cadena
     | ruta
     ;
 
@@ -127,7 +124,6 @@ int main(int argc,char **argv)
 {
   int hayr=0;
 
-
   while(hayr==0){
     char string[300];
     char *po=string;
@@ -137,9 +133,11 @@ int main(int argc,char **argv)
         newstdin1 = fmemopen (po, strlen (po), "r");
     yyin=newstdin1;
     hayr=yyparse();
-
+    usleep(100000);
     fclose(newstdin1);
+
     if(hayr==-3){
+      printf("sdfg");
           FILE *fp = fopen("Bichulga.txt", "r");
           if(fp == NULL) {
              perror("error");
@@ -147,17 +145,21 @@ int main(int argc,char **argv)
           }
           char chunk[300];
           FILE *newstdin;
-          char* po1 = chunk;
+          char* po1;
           while(fgets(chunk, sizeof(chunk), fp) != NULL) {
+            po1=chunk;
             newstdin = fmemopen (po1, strlen (po1), "r");
             yyin=newstdin;
             hayr=yyparse();
-            if(hayr!=0){break;}
+            if(hayr!=0){printf("ayuda");break;}
           }
           fclose(newstdin);
           fclose(fp);
-          /* yyin = fopen("Bichulga.txt","r"); */
+          hayr=0;
+    }else if(hayr==-1){
+      return 0;
     }
+    hayr=0;
   }
 
   return 0;

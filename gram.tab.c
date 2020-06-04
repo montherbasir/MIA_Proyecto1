@@ -68,12 +68,11 @@
 /* First part of user prologue.  */
 #line 2 "gram.y"
 
-
   #include <stdio.h>
   #include <stdlib.h>
   #include <math.h>
   #include <unistd.h>
-  #include <cstring>
+  #include <string.h>
 
   extern int yylex(void);
   extern char *yytext;
@@ -84,7 +83,7 @@
 
   char* ruta_ar;
 
-#line 88 "gram.tab.c"
+#line 87 "gram.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -162,12 +161,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "gram.y"
+#line 21 "gram.y"
 
-//se especifican los tipo de valores para los no terminales y lo terminales
+
 char* TEXT;
 
-#line 171 "gram.tab.c"
+#line 170 "gram.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -545,10 +544,10 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    61,    61,    62,    63,    64,    65,    66,    67,    68,
-      69,    72,    75,    76,    79,    82,    85,    88,    91,    92,
-      95,    96,    97,    98,   101,   102,   105,   106,   107,   108,
-     109,   110,   111,   112,   115,   116
+       0,    58,    58,    59,    60,    61,    62,    63,    64,    65,
+      66,    69,    72,    73,    76,    79,    82,    85,    88,    89,
+      92,    93,    94,    95,    98,    99,   102,   103,   104,   105,
+     106,   107,   108,   109,   112,   113
 };
 #endif
 
@@ -1380,31 +1379,25 @@ yyreduce:
   switch (yyn)
     {
   case 3:
-#line 62 "gram.y"
+#line 59 "gram.y"
                    {return 0;}
-#line 1386 "gram.tab.c"
+#line 1385 "gram.tab.c"
     break;
 
   case 9:
-#line 68 "gram.y"
-             { return -3;}
-#line 1392 "gram.tab.c"
+#line 65 "gram.y"
+              { return -3;}
+#line 1391 "gram.tab.c"
     break;
 
   case 10:
-#line 69 "gram.y"
+#line 66 "gram.y"
           {return -1;}
-#line 1398 "gram.tab.c"
-    break;
-
-  case 12:
-#line 75 "gram.y"
-           {}
-#line 1404 "gram.tab.c"
+#line 1397 "gram.tab.c"
     break;
 
 
-#line 1408 "gram.tab.c"
+#line 1401 "gram.tab.c"
 
       default: break;
     }
@@ -1636,7 +1629,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 119 "gram.y"
+#line 116 "gram.y"
 
 
 void yyerror(const char *s)
@@ -1648,7 +1641,6 @@ int main(int argc,char **argv)
 {
   int hayr=0;
 
-
   while(hayr==0){
     char string[300];
     char *po=string;
@@ -1658,9 +1650,11 @@ int main(int argc,char **argv)
         newstdin1 = fmemopen (po, strlen (po), "r");
     yyin=newstdin1;
     hayr=yyparse();
-
+    usleep(100000);
     fclose(newstdin1);
+
     if(hayr==-3){
+      printf("sdfg");
           FILE *fp = fopen("Bichulga.txt", "r");
           if(fp == NULL) {
              perror("error");
@@ -1668,17 +1662,21 @@ int main(int argc,char **argv)
           }
           char chunk[300];
           FILE *newstdin;
-          char* po1 = chunk;
+          char* po1;
           while(fgets(chunk, sizeof(chunk), fp) != NULL) {
+            po1=chunk;
             newstdin = fmemopen (po1, strlen (po1), "r");
             yyin=newstdin;
             hayr=yyparse();
-            if(hayr!=0){break;}
+            if(hayr!=0){printf("ayuda");break;}
           }
           fclose(newstdin);
           fclose(fp);
-          /* yyin = fopen("Bichulga.txt","r"); */
+          hayr=0;
+    }else if(hayr==-1){
+      return 0;
     }
+    hayr=0;
   }
 
   return 0;

@@ -79,9 +79,9 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "gram.y"
+#line 21 "gram.y"
 
-//se especifican los tipo de valores para los no terminales y lo terminales
+
 char* TEXT;
 
 #line 88 "gram.tab.h"
