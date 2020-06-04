@@ -70,7 +70,8 @@ extern int yydebug;
     num = 276,
     guion = 277,
     igual = 278,
-    exit_ = 279
+    exit_ = 279,
+    exec = 280
   };
 #endif
 
@@ -78,11 +79,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 21 "gram.y"
+#line 22 "gram.y"
 
 //se especifican los tipo de valores para los no terminales y lo terminales
-char TEXT[250];
-int N;
+char* TEXT;
 
 #line 88 "gram.tab.h"
 

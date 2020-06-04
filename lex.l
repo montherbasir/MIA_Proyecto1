@@ -21,6 +21,7 @@ Numero {digito}+
 [-]            {  return (guion); }
 [=]            {   return (igual); }
 "mkdisk"      {   return (mkdisk); }
+"exec"      {   return (exec); }
 "rmdisk"      { return (rmdisk);}
 "fdisk"        { return (fdisk);}
 "mount"        {  return (mount);}

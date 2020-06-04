@@ -6,7 +6,7 @@ mkdisk -size=51200 -path="/home/archivos/fase1/mis archivos/Disco4.disk" -unit=K
 mkDisk -size=20 -path="/home/archivos/fase1/mis archivos/Disco5.disk" -unit=M -fit=WF
 
 #Deberia dar error
-mkdisk -param=x -size=30 -path=/home/archivos/fase1/Disco.disk
+#mkdisk -param=x -size=30 -path=/home/archivos/fase1/Disco.disk
 
 #ELIMINACION DE DISCOS
 #El primero deberia dar error
@@ -97,9 +97,9 @@ unmount -id=vdc2
 unmount -id=vdx1 #ERROR
 
 #REPORTES
-rep -id=vda1 -Path=/home/reports/reporte1.jpg -name=disk
-rep -id=vda1 -Path=/home/reports/reporte2.jpg -name=mbr
-rep -id=vdb1 -path=/home/reports/reporte3.jpg -name=disk
-rep -id=vdb1 -path=/home/reports/reporte4.jpg -name=mbr
-rep -id=vdc1 -path=/home/reports/reporte5.jpg -name=disk
-rep -id=vdc1 -path=/home/reports/reporte6.jpg -name=mbr
+#rep -id=vda1 -Path=/home/reports/reporte1.jpg -name=disk
+#rep -id=vda1 -Path=/home/reports/reporte2.jpg -name=mbr
+#rep -id=vdb1 -path=/home/reports/reporte3.jpg -name=disk
+#rep -id=vdb1 -path=/home/reports/reporte4.jpg -name=mbr
+#rep -id=vdc1 -path=/home/reports/reporte5.jpg -name=disk
+#rep -id=vdc1 -path=/home/reports/reporte6.jpg -name=mbr
