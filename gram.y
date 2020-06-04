@@ -85,7 +85,7 @@ UNIT: guion unit igual identifier
 FIT: guion fit igual identifier
     ;
 
-NAME: guion fit igual NA
+NAME: guion name igual NA
     ;
 
 NA: cadena
@@ -126,9 +126,19 @@ void yyerror(const char *s)
 int main(int argc,char **argv)
 {
   int hayr=0;
+
+
   while(hayr==0){
-    yyin=stdin;
+    char string[300];
+    char *po=string;
+    FILE *newstdin1;
+        printf("Ingrese un comando: \n");
+        scanf(" %[^\n]s",po);
+        newstdin1 = fmemopen (po, strlen (po), "r");
+    yyin=newstdin1;
     hayr=yyparse();
+
+    fclose(newstdin1);
     if(hayr==-3){
           FILE *fp = fopen("Bichulga.txt", "r");
           if(fp == NULL) {
@@ -137,21 +147,18 @@ int main(int argc,char **argv)
           }
           char chunk[300];
           FILE *newstdin;
-          int oldstdin = dup(0);
-
+          char* po1 = chunk;
           while(fgets(chunk, sizeof(chunk), fp) != NULL) {
-            char* po = chunk;
-            newstdin = fmemopen (po, strlen (po), "r");
-            stdin=newstdin;
+            newstdin = fmemopen (po1, strlen (po1), "r");
             yyin=newstdin;
             hayr=yyparse();
             if(hayr!=0){break;}
           }
+          fclose(newstdin);
           fclose(fp);
-          stdin = fdopen(oldstdin,"r+w");/* yyin = fopen("Bichulga.txt","r"); */
+          /* yyin = fopen("Bichulga.txt","r"); */
     }
   }
-  char string[] = "String to be parsed.";
 
   return 0;
 }
