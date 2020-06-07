@@ -15,7 +15,7 @@
 
   char* ruta_ar;
 %}
-
+%language "c++"
 %define parse.trace
 %define parse.error verbose
 %union{

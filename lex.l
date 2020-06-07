@@ -1,13 +1,13 @@
 %option noyywrap
 %option caseless
 %option debug
-/* %option c++ */
+%option c++
 
 
 %{
   #include <stdio.h>
   #include <stdlib.h>
-  #include "gram.tab.h"
+  #include "gram.tab.hh"
   int linea=0;
 %}
 
