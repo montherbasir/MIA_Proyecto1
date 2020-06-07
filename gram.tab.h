@@ -96,5 +96,12 @@ typedef union YYSTYPE YYSTYPE;
 extern YYSTYPE yylval;
 
 int yyparse (void);
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+int func();
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif /* !YY_YY_GRAM_TAB_H_INCLUDED  */

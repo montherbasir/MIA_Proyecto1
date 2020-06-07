@@ -73,11 +73,12 @@
   #include <math.h>
   #include <unistd.h>
   #include <string.h>
-
+    #include "union.h"
   extern int yylex(void);
   extern char *yytext;
   extern int linea;
   extern FILE *yyin;
+
 
   void yyerror(const char *s);
 
@@ -1637,10 +1638,10 @@ void yyerror(const char *s)
   printf("%s \n",s);
 }
 
-int main(int argc,char **argv)
+int func(void)
 {
   int hayr=0;
-
+ prueba();
   while(hayr==0){
     char string[300];
     char *po=string;
@@ -1650,7 +1651,7 @@ int main(int argc,char **argv)
         newstdin1 = fmemopen (po, strlen (po), "r");
     yyin=newstdin1;
     hayr=yyparse();
-    usleep(100000);
+
     fclose(newstdin1);
 
     if(hayr==-3){
@@ -1668,7 +1669,7 @@ int main(int argc,char **argv)
             newstdin = fmemopen (po1, strlen (po1), "r");
             yyin=newstdin;
             hayr=yyparse();
-            if(hayr!=0){printf("ayuda");break;}
+            if(hayr!=0){break;}
           }
           fclose(newstdin);
           fclose(fp);
