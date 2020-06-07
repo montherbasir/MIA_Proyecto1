@@ -22,10 +22,11 @@ int main () {
     std::string name="Part_p";
     char  f = 'b';
     char  t = 'p';
-    char  u = 'k';
-    char  u1 = 'b';
-    //crearDisco(5,&f,&u,s1.c_str());
-    crearParticion(s1.c_str(),1,&u,&t,&f,name.c_str());
+    char  u = 'b';
+    char  u1 = 'k';
+    //crearDisco(3,&f,&u1,s1.c_str());
+    //leerMbr(s1.c_str());
+    crearParticion(s1.c_str(),100,&u,&t,&f,name.c_str());
 
     //eliminarDisco(s1.c_str());
     return 0;
@@ -42,7 +43,12 @@ void crearDisco(int size, const char* fit, const char* unit, const char* path){
         return;
     }
     char un = toupper(*unit);
-    if(un!='M'&&un!='K'){
+    int s=1024;
+    if(un=='M'){
+        s = s*1024;
+    }else if(un=='K'){
+
+    }else{
         std::cout<<"Error: unit no identificado"<<std::endl;
         return;
     }
@@ -57,11 +63,7 @@ void crearDisco(int size, const char* fit, const char* unit, const char* path){
         printf("Error creando directorio");
     }
 
-    int s=1024;
 
-    if(un=='M'){
-        s = s*1024;
-    }
     char* buffer = (char*)malloc(s);
     memset(buffer, '0',s);
 
@@ -70,24 +72,47 @@ void crearDisco(int size, const char* fit, const char* unit, const char* path){
         fwrite(buffer,s,1,f);
     }
 
-    mbr new_mbr =  {
-        .mbr_tamano = size*s,
-        .mbr_fecha_creacion = creacion,
-        .mbr_disk_signature = signature++,
-        .disk_fit = fit_,
-        .mbr_partition ={
-            {.empty = true},
-            {.empty = true},
-            {.empty = true},
-            {.empty = true}
-        }
-    };
+    char name[16] = " ";
+    mbr new_mbr;
+        new_mbr.mbr_tamano = size*s;
+        new_mbr.mbr_fecha_creacion = creacion;
+        new_mbr.mbr_disk_signature = signature++;
+        new_mbr.disk_fit = fit_;
+        new_mbr.mbr_partition[0].empty = true;
+        new_mbr.mbr_partition[0].part_fit = ' ';
+        strcpy(new_mbr.mbr_partition[0].part_name,name);
+        new_mbr.mbr_partition[0].part_size = 0;
+        new_mbr.mbr_partition[0].part_type = ' ';
+        new_mbr.mbr_partition[0].part_start = 0;
+        new_mbr.mbr_partition[0].part_status = 1;
+        new_mbr.mbr_partition[1].empty = true;
+        new_mbr.mbr_partition[1].part_fit = ' ';
+        strcpy(new_mbr.mbr_partition[1].part_name,name);
+        new_mbr.mbr_partition[1].part_size = 0;
+        new_mbr.mbr_partition[1].part_type = ' ';
+        new_mbr.mbr_partition[1].part_start = 0;
+        new_mbr.mbr_partition[1].part_status = 1;
+        new_mbr.mbr_partition[2].empty = true;
+        new_mbr.mbr_partition[2].part_fit = ' ';
+        strcpy(new_mbr.mbr_partition[2].part_name,name);
+        new_mbr.mbr_partition[2].part_size = 0;
+        new_mbr.mbr_partition[2].part_type = ' ';
+        new_mbr.mbr_partition[2].part_start = 0;
+        new_mbr.mbr_partition[2].part_status = 1;
+        new_mbr.mbr_partition[3].empty = true;
+        new_mbr.mbr_partition[3].part_fit = ' ';
+        strcpy(new_mbr.mbr_partition[3].part_name,name);
+        new_mbr.mbr_partition[3].part_size = 0;
+        new_mbr.mbr_partition[3].part_type = ' ';
+        new_mbr.mbr_partition[3].part_start = 0;
+        new_mbr.mbr_partition[3].part_status = 1;
+
 
     fclose(f);
 
     FILE* f1 = fopen(path1.c_str(),"r+b");
     fseek ( f1 , 0 , SEEK_SET );
-    fwrite(&new_mbr,sizeof(mbr),1,f1);
+    fwrite(&new_mbr,sizeof(struct mbr),1,f1);
     fclose(f1);
 
     crearRaid(path1);
@@ -112,13 +137,23 @@ inline bool exists(const std::string& name) {
     return (stat (name.c_str(), &buffer) == 0);
 }
 
-inline void leerMbr(char* path1){
+inline void leerMbr(const char* path1){
     mbr pmbr;
-    FILE* f2 = fopen(path1,"rb");
-    fread(&pmbr,sizeof (mbr),1,f2);
-    std::cout<<pmbr.mbr_tamano<<std::endl;
-    std::cout<<ctime(&pmbr.mbr_fecha_creacion);
-    std::cout<<pmbr.disk_fit<<std::endl;
+    FILE* f2 = fopen(path1,"r+b");
+    fseek(f2,0,SEEK_SET);
+    fread(&pmbr,sizeof (struct mbr),1,f2);
+
+    std::cout<<"tamano "<<pmbr.mbr_tamano<<std::endl;
+    std::cout<<"creacion "<<ctime(&pmbr.mbr_fecha_creacion);
+    std::cout<<"fit "<<pmbr.disk_fit<<std::endl;
+    for(partition part : pmbr.mbr_partition){
+        std::cout<<"name "<<part.part_name <<std::endl;
+        std::cout<<"empty "<<part.empty <<std::endl;
+        std::cout<<"type "<<part.part_type <<std::endl;
+        std::cout<<"fit "<<part.part_fit <<std::endl;
+        std::cout<<"start "<<part.part_start <<std::endl;
+        std::cout<<"size "<<part.part_size <<std::endl;
+    }
     fclose(f2);
 }
 
@@ -158,45 +193,51 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
     mbr pmbr;
     FILE* f2 = fopen(path,"r+b");
     fseek(f2,0,SEEK_SET);
-    fread(&pmbr,sizeof(mbr),1,f2);
+    fread(&pmbr,sizeof(struct mbr),1,f2);
 
+
+    char un = toupper(*unit);
     int s_u=1;
-    char u = tolower(*unit);
-    if(u=='k'){
-        s_u = 1024;
-    }else if(u=='m'){
+    if(un=='M'){
         s_u = 1024*1024;
+    }else if(un=='K'){
+        s_u = 1024;
+    }else if(un=='B'){
+        s_u=1;
+    }else{
+        std::cout<<"Error: unit no identificado"<<std::endl;
+        return;
     }
 
     bool cabe = 0;
     int index=0;
     int t=0;
 
-    char vacio[2];
-    vacio[0] = '0';
-    vacio[1] = '\0';
+    char vacio[1025];
+    memset(vacio,'0',1024);
+    vacio[1024] = '\0';
 
     //Itera todo el disco
 
-    for(int i=sizeof (mbr);i<pmbr.mbr_tamano;i++){
+    for(int i=sizeof (mbr);i<pmbr.mbr_tamano;i+=1024){
         std::cout<<i<<std::endl;
         fseek(f2, i,SEEK_SET);
-        char bloque[2];
-        size_t readS = fread(bloque,1,1,f2);
+        char bloque[1025];
+        size_t readS = fread(bloque,1,1024,f2);
         fflush(f2);
-        bloque[1] = '\0';
+        bloque[1024] = '\0';
 
         if(strcmp(bloque,vacio)==0){
             //Si se leyo el arreglo completo
-            if(readS==(size_t)1){
-
+            if(readS==(size_t)1024){
+                std::cout<<"entra"<<std::endl;
                 if(t==0){
                     index = i;
                 }
-                t ++;
+                t +=1024;
 
                 //Cuando el espacio libre sea el mismo que el de la particion para (frst fit)
-                if(t==size*s_u){
+                if(t>=size*s_u){
                     cabe = 1;
                     break;
                 }
@@ -207,38 +248,40 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
     }
     fclose(f2);
 
-
     //Si se encontro un lugar para la particion
     if(cabe==1){
 
         bool espacio = false;
         //se actualiza el mbr
-        for(partition part : pmbr.mbr_partition){
-            if(part.empty==true){
-                part.empty = false;
-                strcpy(part.part_name, name);
-                part.part_status = '1';
-                part.part_type = 'P';
-                part.part_fit = *fit;
-                part.part_start = index;
-                part.part_size = size;
+        for(int x=0; x<4; x++){
+            partition *part = &pmbr.mbr_partition[x];
+            if(part->empty==true){
+                part->empty = false;
+                strcpy(part->part_name, name);
+                part->part_status = '1';
+                part->part_type = 'P';
+                part->part_fit = toupper(*fit);
+                part->part_start = index;
+                part->part_size = size;
                 espacio = true;
                 break;
             }
         }
 
         if(espacio){
+
             //se escribe 1 para indicar que el espacio esta ocupado por una particion
-            char vacio_1[s_u];
-            memset(vacio_1, '1', s_u);
+            char vacio_1 = '1';
             FILE* f3 = fopen(path,"r+b");
-            std::cout<<size<<std::endl;
-            for(int i=0; i<(size);i++){
-                fseek(f3,index+(s_u*i),SEEK_SET);
-                fwrite(vacio_1,s_u,1,f3);
-            }
             fseek(f3,0,SEEK_SET);
-            fwrite(&pmbr,sizeof (mbr),1,f3);
+            fwrite(&pmbr,sizeof(struct mbr),1,f3);
+            if(size<1024)
+                size=1024;
+            for(int i=0; i<(size*s_u/1024);i+=1024){
+                std::cout<<"index "<<index+i<<std::endl;
+                fseek(f3,index+i,SEEK_SET);
+                fwrite(&vacio_1,1,1,f3);
+            }
             fclose(f3);
         }else{
             std::cout<<"Error ya se crearon 4 particiones"<<std::endl;
@@ -249,7 +292,7 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
         std::cout<<"Error no cabe la particion"<<std::endl;
     }
 
-
+    leerMbr(path);
 
 }
 

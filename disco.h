@@ -10,7 +10,7 @@
 
 std::string parentDir(const std::string& fullPath);
 inline void crearRaid(std::string path1);
-inline void leerMbr(char* path1);
+inline void leerMbr(const char* path1);
 inline bool exists(const std::string& name);
 void crearPartPrimaria(const char* path, int size, const char* unit, const char* fit, const char* name);
     struct partition{
