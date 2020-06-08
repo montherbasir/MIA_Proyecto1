@@ -7,12 +7,12 @@
 
 #include <iostream>
 #include <ctime>
-
+void reporteParticiones(const char* path);
 std::string parentDir(const std::string& fullPath);
 inline void crearRaid(std::string path1);
 inline void leerMbr(const char* path1);
 inline bool exists(const std::string& name);
-void crearPartPrimaria(const char* path, int size, const char* unit, const char* fit, const char* name);
+void crearPartPrimaria(const char* path, int size, const char* unit, const char* fit, const char* name, const char* tipo);
     struct partition{
         char part_status;
         char part_type;
