@@ -15,24 +15,51 @@ extern "C" {
 }
 
 int signature = 0;
+QVector<mPart>* montadas = new QVector<mPart>();
+QVector<mDisk>* discosMont = new QVector<mDisk>();
+int letraDisk = 97;
 
 int main () {
     //func();
     std::string s1="/home/monther/prueee.disk";
-    std::string name="Part_p";
+    std::string s2="/home/monther/prueee1.disk";
+    std::string name="Part_";
+    std::string name1="Part_1";
+    std::string name2="Part_2";
+    std::string name3="Part_3";
+    std::string name4="Part_4";
+    std::string name5="Part_5";
     char  f = 'b';
     char  t = 'p';
     char  u = 'b';
     char  u1 = 'k';
     char t1 = 'e';
     char t2 = 'l';
+
     crearDisco(10,&f,&u1,s1.c_str());
     crearParticion(s1.c_str(),1,&u1,&t,&f,name.c_str());
-    crearParticion(s1.c_str(),5,&u1,&t1,&f,name.c_str());
-    crearParticion(s1.c_str(),1,&u1,&t2,&f,name.c_str());
-    crearParticion(s1.c_str(),3,&u1,&t2,&f,name.c_str());
-    crearParticion(s1.c_str(),100,&u,&t2,&f,name.c_str());
-    reporteParticiones(s1.c_str());
+    crearParticion(s1.c_str(),5,&u1,&t1,&f,name1.c_str());
+    crearParticion(s1.c_str(),1,&u1,&t2,&f,name2.c_str());
+    crearParticion(s1.c_str(),3,&u1,&t2,&f,name3.c_str());
+    crearParticion(s1.c_str(),100,&u,&t2,&f,name4.c_str());
+    crearDisco(10,&f,&u1,s2.c_str());
+    crearParticion(s2.c_str(),1,&u1,&t,&f,name.c_str());
+    crearParticion(s2.c_str(),5,&u1,&t1,&f,name1.c_str());
+    crearParticion(s2.c_str(),1,&u1,&t2,&f,name2.c_str());
+    crearParticion(s2.c_str(),3,&u1,&t2,&f,name5.c_str());
+    crearParticion(s2.c_str(),100,&u,&t2,&f,name4.c_str());
+
+    mountParticion(s1.c_str(),name.c_str());
+    mountParticion(s2.c_str(),name1.c_str());
+    mountParticion(s1.c_str(),name2.c_str());
+    mountParticion(s1.c_str(),name3.c_str());
+    mountParticion(s1.c_str(),name4.c_str());
+    mountParticion(s1.c_str(),name5.c_str());
+    mountParticion(s2.c_str(),name1.c_str());
+    mountParticion(s2.c_str(),name2.c_str());
+    mountParticion(s2.c_str(),name4.c_str());
+
+
     //eliminarDisco(s1.c_str());
     return 0;
 }
@@ -161,6 +188,10 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
     char t = tolower(*type);
     if(exists(path)==0){
         std::cout << "Error: no existe el disco" <<std::endl;
+        return;
+    }
+    if(existeParticion(path,name)){
+        std::cout << "Error: ya existe la particion" <<std::endl;
         return;
     }
     if(t=='p'){
@@ -407,7 +438,7 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
     //Si se encontro un lugar para la particion
     if(cabe==1){
 
-
+        int size_new = size;
         char vacio_1 = '2';
         FILE* f3 = fopen(path,"r+b");
         if(size*s_u<1024)
@@ -437,7 +468,7 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
             pebr4->part_fit = toupper(*fit);
             strcpy(pebr4->part_name,name);
             pebr4->part_next = -1;
-            pebr4->part_size = size*s_u;
+            pebr4->part_size = size_new*s_u;
             pebr4->part_status = '1';
             fseek(f4,inicioEbr,SEEK_SET);
             fwrite(&pebr3,sizeof (ebr),1,f4);
@@ -449,7 +480,7 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
             pebr5.part_fit = toupper(*fit);
             strcpy(pebr5.part_name,name);
             pebr5.part_next = -1;
-            pebr5.part_size = size*s_u;
+            pebr5.part_size = size_new*s_u;
             pebr5.part_start = index;
             pebr5.part_status = '1';
             fseek(f4,index,SEEK_SET);
@@ -463,7 +494,6 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
         std::cout<<"Error no cabe la particion"<<std::endl;
     }
 
-    //leerMbr(path);
 
 }
 
@@ -689,11 +719,122 @@ void addSizeparticion(){
 
 }
 
-void mountParticion(){
+void mountParticion(const char* path, const char* name){
+    if(exists(path)==0){
+        std::cout << "Error: no existe el disco" <<std::endl;
+        return;
+    }
+    if(!existeParticion(path,name)){
+        std::cout << "Error: no ya existe la particion" <<std::endl;
+        return;
+    }
+    std::string ruta = path;
+    std::string id = "vd";
+    char newId = estaMontadoDisk(path);
+    if(newId==' '){
+        if(discosMont->size()==0)
+            letraDisk = 97;
+        mDisk md;
+        strcpy(md.disk_p,path);
+        md.id = (char)letraDisk++;
+        id += md.id;
+        discosMont->append(md);
+    }else{
+        id += newId;
+    }
 
+    int pm = 1;
+    for(mPart p : *montadas){
+        std::string r = p.disk_p;
+        if(ruta==r){
+            pm++;
+            if(strcmp(p.nombre,name)==0){
+                std::cout<<"Error ya esta montada la particion"<<std::endl;
+                return;
+            }
+        }
+    }
+
+    id += std::to_string(pm);
+    mPart mp;
+    strcpy(mp.id,id.c_str());
+    strcpy(mp.disk_p,path);
+    strcpy(mp.nombre,name);
+    montadas->append(mp);
+    std::cout<<"Particion montada con id: "<<mp.id<<std::endl;
 }
 
-void unmountParticion(){
+char estaMontadoDisk(const char* path){
+    std::string ruta = path;
+    for(mDisk d : *discosMont){
+        std::string discP = d.disk_p;
+        if(discP==ruta){
 
+            return d.id;
+        }
+    }
+    return ' ';
+}
+
+void unmountParticion(const char* id){
+    std::string strid = id;
+    for(int i=0;i<montadas->size();i++){
+        mPart mp = montadas->at(i);
+        std::string mpid = mp.id;
+        if(mpid==strid){
+            montadas->remove(i);
+            std::cout<<"Particion desmontada con id: "<<mpid<<std::endl;
+            return;
+        }
+    }
+
+    std::cout<<"Error la particion no esta montada"<<std::endl;
+}
+
+bool existeParticion(const char* path, const char *name){
+    if(exists(path)==0){
+        return false;
+    }
+    int primer_ebr = -1;
+    mbr pmbr;
+    FILE* f2 = fopen(path,"r+b");
+    fseek(f2,0,SEEK_SET);
+    fread(&pmbr,sizeof (struct mbr),1,f2);
+    fclose(f2);
+    for(partition p : pmbr.mbr_partition){
+        if(p.part_type=='E'){
+            primer_ebr = p.part_start;
+        }
+        if(strcmp(p.part_name,name)==0){
+            return true;
+        }
+    }
+
+    if(primer_ebr!=-1){
+        ebr pebr;
+        FILE* f4 = fopen(path,"r+b");
+        fseek(f4,primer_ebr,SEEK_SET);
+        fread(&pebr,sizeof(ebr),1,f4);
+
+        ebr *pebr2;
+        ebr p = pebr;
+
+        while(p.part_next!=-1){
+            if(strcmp(p.part_name,name)==0){
+                fclose(f4);
+                return true;
+            }
+            pebr2 = &p;
+            fseek(f4,pebr2->part_next,SEEK_SET);
+            fread(&p,sizeof(struct ebr),1,f4);
+        }
+        if(strcmp(p.part_name,name)==0){
+            fclose(f4);
+            return true;
+        }
+
+        fclose(f4);
+    }
+    return false;
 }
 

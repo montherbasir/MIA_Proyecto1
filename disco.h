@@ -14,6 +14,9 @@ inline void leerMbr(const char* path1);
 inline bool exists(const std::string& name);
 void crearPartPrimaria(const char* path, int size, const char* unit, const char* fit, const char* name, const char* tipo);
 void crearPartLogica(const char* path, int size, const char* unit, const char* fit, const char* name, int inicioEbr, int finEbr);
+char estaMontadoDisk(const char* path);
+void unmountParticion(const char* id);
+bool existeParticion(const char* path, const char *name);
     struct partition{
         char part_status;
         char part_type;
@@ -41,6 +44,17 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
       partition mbr_partition[4];
     };
 
+    struct mPart {
+        char disk_p[250];
+        char id[10];
+        char nombre[16];
+    };
+
+    struct mDisk {
+        char disk_p[250];
+        char id;
+    };
+
 extern "C"
 {
 #endif
@@ -53,7 +67,7 @@ extern void eliminarDisco(const char* path);
 extern void crearParticion(const char* path, int size, const char* unit, const char* type, const char* fit, const char* name);
 extern void eliminarParticion();
 extern void addSizeparticion();
-extern void mountParticion();
+extern void mountParticion(const char* path, const char* name);
 extern void unmountParticion();
 
 
