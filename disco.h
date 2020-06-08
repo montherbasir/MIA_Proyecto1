@@ -13,6 +13,7 @@ inline void crearRaid(std::string path1);
 inline void leerMbr(const char* path1);
 inline bool exists(const std::string& name);
 void crearPartPrimaria(const char* path, int size, const char* unit, const char* fit, const char* name, const char* tipo);
+void crearPartLogica(const char* path, int size, const char* unit, const char* fit, const char* name, int inicioEbr, int finEbr);
     struct partition{
         char part_status;
         char part_type;

@@ -25,11 +25,13 @@ int main () {
     char  u = 'b';
     char  u1 = 'k';
     char t1 = 'e';
-    crearDisco(6,&f,&u1,s1.c_str());
+    char t2 = 'l';
+    crearDisco(10,&f,&u1,s1.c_str());
     crearParticion(s1.c_str(),1,&u1,&t,&f,name.c_str());
-    crearParticion(s1.c_str(),100,&u,&t1,&f,name.c_str());
-    crearParticion(s1.c_str(),2,&u1,&t,&f,name.c_str());
-    crearParticion(s1.c_str(),1,&u1,&t,&f,name.c_str());
+    crearParticion(s1.c_str(),5,&u1,&t1,&f,name.c_str());
+    crearParticion(s1.c_str(),1,&u1,&t2,&f,name.c_str());
+    crearParticion(s1.c_str(),3,&u1,&t2,&f,name.c_str());
+    crearParticion(s1.c_str(),100,&u,&t2,&f,name.c_str());
     reporteParticiones(s1.c_str());
     //eliminarDisco(s1.c_str());
     return 0;
@@ -162,13 +164,14 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
         return;
     }
     if(t=='p'){
-        crearPartPrimaria(path,size,unit,fit,name,type);
+        crearPartPrimaria(path,size,unit,fit,name,&t);
         crearRaid(path);
     }else if(t=='e'){
         mbr pmbr;
         FILE* f2 = fopen(path,"r+b");
         fseek(f2,0,SEEK_SET);
         fread(&pmbr,sizeof (struct mbr),1,f2);
+        fclose(f2);
 
         for(partition p : pmbr.mbr_partition){
             if(p.part_type=='E'){
@@ -177,13 +180,35 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
             }
         }
 
-        crearPartPrimaria(path,size,unit,fit,name,type);
+
+
+        crearPartPrimaria(path,size,unit,fit,name,&t);
         crearRaid(path);
 
     }else if(t=='l'){
+        int inicio = 0;
+        int fin = 0;
+        mbr pmbr;
+        FILE* f2 = fopen(path,"r+b");
+        fseek(f2,0,SEEK_SET);
+        fread(&pmbr,sizeof (struct mbr),1,f2);
+        fclose(f2);
+        bool ext = false;
+        for(partition p : pmbr.mbr_partition){
+            if(p.part_type=='E'){
+                ext = true;
+                inicio = p.part_start;
+                fin = inicio+p.part_size;
+                break;
+            }
+        }
 
+        if(ext){
+            crearPartLogica(path,size,unit,fit,name,inicio,fin);
+            crearRaid(path);
+        }
     }else{
-
+        std::cout << "Error: tipo de particion descconocido" <<std::endl;
     }
 }
 
@@ -284,6 +309,19 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
                 fseek(f3,index+(i*1024),SEEK_SET);
                 fwrite(&vacio_1,1,1,f3);
             }
+
+            if(*tipo=='e'){
+                ebr pebr;
+                pebr.part_fit = ' ';
+                pebr.part_name[0] = ' ';
+                pebr.part_next = -1;
+                pebr.part_size = 0;
+                pebr.part_start = index;
+                pebr.part_status = '0';
+                fseek(f2,index,SEEK_SET);
+                fwrite(&pebr,sizeof (struct ebr),1,f3);
+            }
+
             fclose(f3);
         }else{
             std::cout<<"Error ya se crearon 4 particiones"<<std::endl;
@@ -298,9 +336,140 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
 
 }
 
+void crearPartLogica(const char* path, int size, const char* unit, const char* fit, const char* name, int inicioEbr, int finEbr){
+
+    //Copia el contenido de la mbr
+    ebr pebr;
+    FILE* f2 = fopen(path,"r+b");
+    fseek(f2,inicioEbr,SEEK_SET);
+    fread(&pebr,sizeof(ebr),1,f2);
+
+
+    char un = toupper(*unit);
+    int s_u=1;
+    if(un=='M'){
+        s_u = 1024*1024;
+    }else if(un=='K'){
+        s_u = 1024;
+    }else if(un=='B'){
+        s_u=1;
+    }else{
+        std::cout<<"Error: unit no identificado"<<std::endl;
+        return;
+    }
+
+    bool cabe = 0;
+    int index=inicioEbr;
+    int t=0;
+
+    char vacio[1025];
+    memset(vacio,'0',1024);
+    vacio[1024] = '\0';
+    vacio[0] = '1';
+    //Itera todo el disco
+
+//    std::cout<<pebr.part_status<<std::endl;
+//    if(pebr.part_status=='0'){
+//            t = 1024;
+//    }
+    for(int i=inicioEbr;i<finEbr;i+=1024){
+        std::cout<<i<<std::endl;
+        fseek(f2, i,SEEK_SET);
+        char bloque[1025];
+        size_t readS = fread(bloque,1,1024,f2);
+        fflush(f2);
+        bloque[1024] = '\0';
+
+        if(strcmp(bloque,vacio)==0){
+            //Si se leyo el arreglo completo
+            if(readS==(size_t)1024){
+                std::cout<<"entra"<<std::endl;
+                if(t==0){
+                    index = i;
+                }
+                t += 1024;
+                std::cout<<t<<" "<<size*s_u<<std::endl;
+                //Cuando el espacio libre sea el mismo que el de la particion para (frst fit)
+                if(t>=size*s_u){
+                    cabe = 1;
+                    break;
+                }
+            }
+        } else {
+            t = 0;
+            if(pebr.part_status=='0'&&i==inicioEbr){
+                    t += 1024;
+            }
+        }
+    }
+    fclose(f2);
+
+    //Si se encontro un lugar para la particion
+    if(cabe==1){
+
+
+        char vacio_1 = '2';
+        FILE* f3 = fopen(path,"r+b");
+        if(size*s_u<1024)
+            size=1024;
+
+
+        for(int i=0; i<(size*s_u/1024);i++){
+            std::cout<<"index "<<index+(i*1024)<<std::endl;
+            fseek(f3,index+(i*1024),SEEK_SET);
+            fwrite(&vacio_1,1,1,f3);
+        }
+        fclose(f3);
+
+        //se actualizan los ebr
+        ebr *pebr2;
+        ebr pebr3 = pebr;
+        FILE* f4 = fopen(path,"r+b");
+        while(pebr3.part_next!=-1){
+            pebr2 = &pebr3;
+            fseek(f4,pebr2->part_next,SEEK_SET);
+            fread(&pebr3,sizeof(struct ebr),1,f4);
+        }
+
+        ebr *pebr4 = &pebr3;
+        //si es la primera particion
+        if(pebr4->part_status=='0'){
+            pebr4->part_fit = toupper(*fit);
+            strcpy(pebr4->part_name,name);
+            pebr4->part_next = -1;
+            pebr4->part_size = size*s_u;
+            pebr4->part_status = '1';
+            fseek(f4,inicioEbr,SEEK_SET);
+            fwrite(&pebr3,sizeof (ebr),1,f4);
+        }else{
+            pebr4->part_next = index;
+            fseek(f4,pebr4->part_start,SEEK_SET);
+            fwrite(&pebr3,sizeof (ebr),1,f4);
+            ebr pebr5;
+            pebr5.part_fit = toupper(*fit);
+            strcpy(pebr5.part_name,name);
+            pebr5.part_next = -1;
+            pebr5.part_size = size*s_u;
+            pebr5.part_start = index;
+            pebr5.part_status = '1';
+            fseek(f4,index,SEEK_SET);
+            fwrite(&pebr5,sizeof (ebr),1,f4);
+        }
+
+
+         fclose(f4);
+
+    }else{
+        std::cout<<"Error no cabe la particion"<<std::endl;
+    }
+
+    //leerMbr(path);
+
+}
+
 void reporteParticiones(const char* path){
     std::string graph = "digraph {\n splines=\"line\";\n rankdir = TB;\n node [shape=plain, height=0.5, width=1.5, fontsize=25];\n graph[dpi=90];\n\n N [label=<\n";
-
+    int primer_ebr = -1;
     std::string fpath = path;
     const size_t lastSlashIndex = fpath.find_last_of("/\\");
     std::string s = fpath.substr(lastSlashIndex+1);
@@ -346,7 +515,9 @@ void reporteParticiones(const char* path){
 
     int i = 1;
     for(partition p : pmbr.mbr_partition){
-
+        if(p.part_type=='E'){
+            primer_ebr = p.part_start;
+        }
         if(!p.empty){
     g += " \t<tr><td align=\"left\">";
             g += "<b>part_status_";
@@ -393,16 +564,121 @@ void reporteParticiones(const char* path){
         i++;
     }
 
+    i=1;
+    if(primer_ebr!=-1){
+        g += " \t<tr><td colspan=\"2\"><b>EBR</b></td></tr>\n";
+        ebr pebr;
+        FILE* f4 = fopen(path,"r+b");
+        fseek(f4,primer_ebr,SEEK_SET);
+        fread(&pebr,sizeof(ebr),1,f4);
+
+        ebr *pebr2;
+        ebr p = pebr;
+
+        while(p.part_next!=-1){
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_status_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_status;
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_fit_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_fit;
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_start_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_start);
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_size_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_size);
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_next_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_next);
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_name_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_name;
+            g += "</td></tr>\n";
+
+            pebr2 = &p;
+            fseek(f4,pebr2->part_next,SEEK_SET);
+            fread(&p,sizeof(struct ebr),1,f4);
+            i++;
+        }
+        fclose(f4);
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_status_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += p.part_status;
+        g += "</td></tr>\n";
+
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_fit_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += p.part_fit;
+        g += "</td></tr>\n";
+
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_start_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += std::to_string(p.part_start);
+        g += "</td></tr>\n";
+
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_size_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += std::to_string(p.part_size);
+        g += "</td></tr>\n";
+
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_next_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += std::to_string(p.part_next);
+        g += "</td></tr>\n";
+
+        g += " \t<tr><td align=\"left\">";
+        g += "<b>part_name_";
+        g += std::to_string(i);
+        g += "</b></td><td>";
+        g += p.part_name;
+        g += "</td></tr>\n";
+    }
+
+
 
     graph += g;
     graph += " </table>\n >];\n}";
     std::cout<<graph<<std::endl;
 
     std::ofstream myfile;
-            myfile.open("stack.dot");
-            myfile << graph;
-            myfile.close();
-            system("dot -Tpng stack.dot -o stack.png");
+    myfile.open("stack.dot");
+    myfile << graph;
+    myfile.close();
+    system("dot -Tpng stack.dot -o stack.png");
 }
 
 void eliminarParticion(){
