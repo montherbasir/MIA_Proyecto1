@@ -9,6 +9,7 @@
 #include "disco.h"
 #include <sys/stat.h>
 #include <QVector>
+#include <unistd.h>
 
 extern "C" {
 #include "gram.tab.h"
@@ -18,53 +19,59 @@ int signature = 0;
 QVector<mPart>* montadas = new QVector<mPart>();
 QVector<mDisk>* discosMont = new QVector<mDisk>();
 int letraDisk = 97;
-
+int contRep =0;
 int main () {
-    //func();
-    std::string s1="/home/monther/prueee.disk";
-    std::string s2="/home/monther/prueee1.disk";
-    std::string name="Part_";
-    std::string name1="Part_1";
-    std::string name2="Part_2";
-    std::string name3="Part_3";
-    std::string name4="Part_4";
-    std::string name5="Part_5";
-    char  f = 'b';
-    char  t = 'p';
-    char  u = 'b';
-    char  u1 = 'k';
-    char t1 = 'e';
-    char t2 = 'l';
+    func();
+    std::string p = "/home/Disco4.disk";
+//    eliminarDisco(p.c_str());
+//    std::string s1="/home/monther/prueee.disk";
+//    std::string s2="/home/monther/nuevo.disk";
+//    std::string s3="/home/monther/reportes/reporte2/disco.jpg";
+//    std::string name="Part_";
+//    std::string name1="Part_1";
+//    std::string name2="Part_2";
+//    std::string name3="Part_3";
+//    std::string name4="Part_4";
+//    std::string name5="Part_5";
+//    char  f = 'b';
+//    char  t = 'p';
+//    char  u = 'b';
+//    char  u1 = 'k';
+//    char t1 = 'e';
+//    char t2 = 'l';
+//    std::string id = "vda1";
+//    std::string id2 = "vdb4";
 
-    crearDisco(10,&f,&u1,s1.c_str());
-    crearParticion(s1.c_str(),1,&u1,&t,&f,name.c_str());
-    crearParticion(s1.c_str(),5,&u1,&t1,&f,name1.c_str());
-    crearParticion(s1.c_str(),1,&u1,&t2,&f,name2.c_str());
-    crearParticion(s1.c_str(),3,&u1,&t2,&f,name3.c_str());
-    crearParticion(s1.c_str(),100,&u,&t2,&f,name4.c_str());
-    crearDisco(10,&f,&u1,s2.c_str());
-    crearParticion(s2.c_str(),1,&u1,&t,&f,name.c_str());
-    crearParticion(s2.c_str(),5,&u1,&t1,&f,name1.c_str());
-    crearParticion(s2.c_str(),1,&u1,&t2,&f,name2.c_str());
-    crearParticion(s2.c_str(),3,&u1,&t2,&f,name5.c_str());
-    crearParticion(s2.c_str(),100,&u,&t2,&f,name4.c_str());
+//    crearDisco(5,&f,&u1,s1.c_str());
+//    crearParticion(s1.c_str(),1,&u1,&t,&f,name.c_str());
+//    crearParticion(s1.c_str(),2,&u1,&t1,&f,name1.c_str());
+//    crearParticion(s1.c_str(),350,&u,&t2,&f,name2.c_str());
+//    crearParticion(s1.c_str(),1,&u,&t2,&f,name1.c_str());
+//        crearDisco(5,&f,&u1,s2.c_str());
+//        crearParticion(s2.c_str(),1,&u1,&t,&f,name.c_str());
+    //    crearParticion(s2.c_str(),3,&u1,&t1,&f,name1.c_str());
+    //crearParticion(s2.c_str(),350,&u,&t,&f,name2.c_str());
 
-    mountParticion(s1.c_str(),name.c_str());
-    mountParticion(s2.c_str(),name1.c_str());
-    mountParticion(s1.c_str(),name2.c_str());
-    mountParticion(s1.c_str(),name3.c_str());
-    mountParticion(s1.c_str(),name4.c_str());
-    mountParticion(s1.c_str(),name5.c_str());
-    mountParticion(s2.c_str(),name1.c_str());
-    mountParticion(s2.c_str(),name2.c_str());
-    mountParticion(s2.c_str(),name4.c_str());
 
+//    mountParticion(s1.c_str(),name.c_str());
+//        mountParticion(s2.c_str(),name.c_str());
+    //    mountParticion(s1.c_str(),name2.c_str());
+//    mountParticion(s1.c_str(),name1.c_str());
+    //    mountParticion(s2.c_str(),name1.c_str());
+    //    mountParticion(s2.c_str(),name2.c_str());
+    //    mountParticion(s2.c_str(),name4.c_str());
+
+    //reporteParticiones(s2.c_str(),id.c_str());
+//    reporteDisco(s3.c_str(),id.c_str());
+    //reporteDisco(s2.c_str(),id2.c_str());
 
     //eliminarDisco(s1.c_str());
     return 0;
 }
 
 void crearDisco(int size, const char* fit, const char* unit, const char* path){
+
+
     if(size<=0){
         std::cout<<"Error: size es menor o igual a 0"<<std::endl;
         return;
@@ -94,7 +101,9 @@ void crearDisco(int size, const char* fit, const char* unit, const char* path){
     {
         printf("Error creando directorio");
     }
-
+    std::string chmod = "sudo chmod 777 -R ";
+    chmod += parentDir(path);
+    system(chmod.c_str());
 
     char* buffer = (char*)malloc(s);
     memset(buffer, '0',s);
@@ -130,6 +139,7 @@ void crearDisco(int size, const char* fit, const char* unit, const char* path){
     fwrite(&new_mbr,sizeof(struct mbr),1,f1);
     fclose(f1);
 
+    std::cout<<"Disco creado: "<<size<<" "<<fit<<" "<<unit<<" "<<path<<std::endl;
     crearRaid(path1);
 }
 
@@ -172,17 +182,31 @@ inline void leerMbr(const char* path1){
     fclose(f2);
 }
 
-inline void eliminarDisco(const char* path){
-    if( remove(path) != 0 ){
-        std::cout<< "Error eliminando disco" <<std::endl;
-    }else{
-        std::cout<< "Disco eliminado" <<std::endl;
-    }
+void eliminarDisco(const char* path){
+    std::cout<<"Desea eliminar el disco: "<<path<<"? (y/n)"<<std::endl;
+    char c = ' ';
+    std::cin>>c;
+    if(c=='y'||c=='Y'){
+        if( remove(path) != 0 ){
+            std::cout<< "Error eliminando disco" <<std::endl;
+        }else{
+            std::cout<< "Disco eliminado" <<std::endl;
+        }
 }
 
-//void fdisk(const char* path, int size, const char* unit, const char* type, const char* fit, const char* name){
+}
 
-//}
+void fdisk_(const char* path, int size, const char* unit, const char* type, const char* fit, const char* name, const char* del, int add){
+    //std::cout<<type<<" "<<size<<" "<<fit<<" "<<unit<<" "<<path<<" "<<name<<" "<<del<<" "<<add<<std::endl;
+    if(strcmp(del,"-1")!=0){
+        //Eliminar particion
+        eliminarParticion(del,name,path);
+    }else if(add!=0){
+        //Agregar espacio
+    }else{
+        crearParticion(path,size,unit,type,fit,name);
+    }
+}
 
 void crearParticion(const char* path, int size, const char* unit, const char* type, const char* fit, const char* name){
     char t = tolower(*type);
@@ -196,6 +220,7 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
     }
     if(t=='p'){
         crearPartPrimaria(path,size,unit,fit,name,&t);
+        std::cout<<"Particion creada: "<<size<<" "<<fit<<" "<<unit<<" "<<path<<" "<<name<<" "<<type<<std::endl;
         crearRaid(path);
     }else if(t=='e'){
         mbr pmbr;
@@ -214,6 +239,7 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
 
 
         crearPartPrimaria(path,size,unit,fit,name,&t);
+                std::cout<<"Particion creada: "<<size<<" "<<fit<<" "<<unit<<" "<<path<<" "<<name<<" "<<type<<std::endl;
         crearRaid(path);
 
     }else if(t=='l'){
@@ -236,7 +262,10 @@ void crearParticion(const char* path, int size, const char* unit, const char* ty
 
         if(ext){
             crearPartLogica(path,size,unit,fit,name,inicio,fin);
+                    std::cout<<"Particion creada: "<<size<<" "<<fit<<" "<<unit<<" "<<path<<" "<<name<<" "<<type<<std::endl;
             crearRaid(path);
+        }else{
+            std::cout << "Error: no existe una particion extnedida" <<std::endl;
         }
     }else{
         std::cout << "Error: tipo de particion descconocido" <<std::endl;
@@ -276,7 +305,6 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
     //Itera todo el disco
 
     for(int i=sizeof (mbr);i<pmbr.mbr_tamano;i+=1024){
-        std::cout<<i<<std::endl;
         fseek(f2, i,SEEK_SET);
         char bloque[1025];
         size_t readS = fread(bloque,1,1024,f2);
@@ -286,17 +314,21 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
         if(strcmp(bloque,vacio)==0){
             //Si se leyo el arreglo completo
             if(readS==(size_t)1024){
-                std::cout<<"entra"<<std::endl;
                 if(t==0){
                     index = i;
                 }
                 t += 1024;
 
-                //Cuando el espacio libre sea el mismo que el de la particion para (frst fit)
-                if(t>=size*s_u){
-                    cabe = 1;
-                    break;
+            }else{
+                if(t==0){
+                    index = i;
                 }
+                t += (int)readS;
+            }
+            //Cuando el espacio libre sea el mismo que el de la particion para (frst fit)
+            if(t>=size*s_u){
+                cabe = 1;
+                break;
             }
         } else {
             t = 0;
@@ -336,7 +368,6 @@ void crearPartPrimaria(const char* path, int size, const char* unit, const char*
 
 
             for(int i=0; i<(size*s_u/1024);i++){
-                std::cout<<"index "<<index+(i*1024)<<std::endl;
                 fseek(f3,index+(i*1024),SEEK_SET);
                 fwrite(&vacio_1,1,1,f3);
             }
@@ -399,12 +430,11 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
     vacio[0] = '1';
     //Itera todo el disco
 
-//    std::cout<<pebr.part_status<<std::endl;
-//    if(pebr.part_status=='0'){
-//            t = 1024;
-//    }
+    //    std::cout<<pebr.part_status<<std::endl;
+    //    if(pebr.part_status=='0'){
+    //            t = 1024;
+    //    }
     for(int i=inicioEbr;i<finEbr;i+=1024){
-        std::cout<<i<<std::endl;
         fseek(f2, i,SEEK_SET);
         char bloque[1025];
         size_t readS = fread(bloque,1,1024,f2);
@@ -414,12 +444,10 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
         if(strcmp(bloque,vacio)==0){
             //Si se leyo el arreglo completo
             if(readS==(size_t)1024){
-                std::cout<<"entra"<<std::endl;
                 if(t==0){
                     index = i;
                 }
                 t += 1024;
-                std::cout<<t<<" "<<size*s_u<<std::endl;
                 //Cuando el espacio libre sea el mismo que el de la particion para (frst fit)
                 if(t>=size*s_u){
                     cabe = 1;
@@ -429,7 +457,7 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
         } else {
             t = 0;
             if(pebr.part_status=='0'&&i==inicioEbr){
-                    t += 1024;
+                t += 1024;
             }
         }
     }
@@ -446,7 +474,6 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
 
 
         for(int i=0; i<(size*s_u/1024);i++){
-            std::cout<<"index "<<index+(i*1024)<<std::endl;
             fseek(f3,index+(i*1024),SEEK_SET);
             fwrite(&vacio_1,1,1,f3);
         }
@@ -488,7 +515,7 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
         }
 
 
-         fclose(f4);
+        fclose(f4);
 
     }else{
         std::cout<<"Error no cabe la particion"<<std::endl;
@@ -497,8 +524,41 @@ void crearPartLogica(const char* path, int size, const char* unit, const char* f
 
 }
 
-void reporteParticiones(const char* path){
-    std::string graph = "digraph {\n splines=\"line\";\n rankdir = TB;\n node [shape=plain, height=0.5, width=1.5, fontsize=25];\n graph[dpi=90];\n\n N [label=<\n";
+void reportes(const char* name, const char* path, const char* id){
+    std::cout<<name<<" "<<path<<" "<<id<<std::endl;
+    std::string sl = name;
+    transform(sl.begin(), sl.end(), sl.begin(), ::tolower);
+    if(strcmp(sl.c_str(),"mbr")==0){
+        reporteParticiones(path,id);
+    }else if(strcmp(sl.c_str(),"disk")==0){
+        reporteDisco(path,id);
+    }else{
+        std::cout<<"Error reporte no identificado"<<std::endl;
+    }
+}
+
+void reporteParticiones(const char* pRep, const char* id){
+
+    std::string pa = diskPathParticion(id);
+
+    std::string mk="mkdir -p ";
+    std::string p = mk+parentDir(pRep);
+
+    const int dir_err = system(p.c_str());
+    if (-1 == dir_err)
+    {
+        printf("Error creando directorio");
+    }
+    std::string chmod = "sudo chmod 777 -R ";
+    chmod += parentDir(pRep);
+    system(chmod.c_str());
+
+    std::string ext = pRep;
+    const size_t lastIndex = ext.find_last_of(".");
+    ext = ext.substr(lastIndex+1,ext.size());
+
+    const char *path = pa.c_str();
+    std::string graph = "digraph {\n splines=\"line\";\n rankdir = TB;\n node [shape=plain, fontsize=25];\n graph[dpi=90];\n\n N [label=<\n";
     int primer_ebr = -1;
     std::string fpath = path;
     const size_t lastSlashIndex = fpath.find_last_of("/\\");
@@ -549,42 +609,42 @@ void reporteParticiones(const char* path){
             primer_ebr = p.part_start;
         }
         if(!p.empty){
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_status_";
             g += std::to_string(i);
             g += "</b></td><td>";
             g += std::to_string(!p.empty);
             g += "</td></tr>\n";
 
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_type_";
             g += std::to_string(i);
             g += "</b></td><td>";
             g += p.part_type;
             g += "</td></tr>\n";
 
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_fit_";
             g += std::to_string(i);
             g += "</b></td><td>";
             g += p.part_fit;
             g += "</td></tr>\n";
 
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_start_";
             g += std::to_string(i);
             g += "</b></td><td>";
             g += std::to_string(p.part_start);
             g += "</td></tr>\n";
 
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_size_";
             g += std::to_string(i);
             g += "</b></td><td>";
             g += std::to_string(p.part_size);
             g += "</td></tr>\n";
 
-    g += " \t<tr><td align=\"left\">";
+            g += " \t<tr><td align=\"left\">";
             g += "<b>part_name_";
             g += std::to_string(i);
             g += "</b></td><td>";
@@ -655,64 +715,348 @@ void reporteParticiones(const char* path){
             i++;
         }
         fclose(f4);
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_status_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += p.part_status;
-        g += "</td></tr>\n";
 
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_fit_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += p.part_fit;
-        g += "</td></tr>\n";
+        if(p.part_status=='1'){
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_status_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_status;
+            g += "</td></tr>\n";
 
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_start_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += std::to_string(p.part_start);
-        g += "</td></tr>\n";
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_fit_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_fit;
+            g += "</td></tr>\n";
 
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_size_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += std::to_string(p.part_size);
-        g += "</td></tr>\n";
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_start_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_start);
+            g += "</td></tr>\n";
 
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_next_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += std::to_string(p.part_next);
-        g += "</td></tr>\n";
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_size_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_size);
+            g += "</td></tr>\n";
 
-        g += " \t<tr><td align=\"left\">";
-        g += "<b>part_name_";
-        g += std::to_string(i);
-        g += "</b></td><td>";
-        g += p.part_name;
-        g += "</td></tr>\n";
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_next_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += std::to_string(p.part_next);
+            g += "</td></tr>\n";
+
+            g += " \t<tr><td align=\"left\">";
+            g += "<b>part_name_";
+            g += std::to_string(i);
+            g += "</b></td><td>";
+            g += p.part_name;
+            g += "</td></tr>\n";
+        }
     }
 
 
 
     graph += g;
     graph += " </table>\n >];\n}";
-    std::cout<<graph<<std::endl;
 
     std::ofstream myfile;
-    myfile.open("stack.dot");
+    std::string myf = "mbr";
+    myf += std::to_string(contRep++);
+    myf += ".dot";
+    myfile.open(myf);
     myfile << graph;
     myfile.close();
-    system("dot -Tpng stack.dot -o stack.png");
+    std::string sys = "dot -T";
+    sys += ext;
+    sys += " ";
+    sys += myf;
+    sys += " -o ";
+    sys += pRep;
+    system(sys.c_str());
+    sleep(1);
 }
 
-void eliminarParticion(){
+void reporteDisco(const char* pRep, const char* id){
 
+    std::string path = diskPathParticion(id);
+    std::string mk="mkdir -p ";
+    std::string p = mk+parentDir(pRep);
+
+    const int dir_err = system(p.c_str());
+    if (-1 == dir_err)
+    {
+        printf("Error creando directorio");
+    }
+    std::string chmod = "sudo chmod 777 -R ";
+    chmod += parentDir(pRep);
+    system(chmod.c_str());
+
+    std::string ext = pRep;
+    const size_t lastIndex = ext.find_last_of(".");
+    ext = ext.substr(lastIndex+1,ext.size());
+    if(path!=""){
+        std::string graph = "digraph {\n splines=\"line\";\n rankdir = TB;\n node [shape=plain, fontsize=25];\n graph[dpi=90];\n\n N [label=<\n";
+        int primer_ebr = -1;
+        std::string fpath = path;
+        const size_t lastSlashIndex = fpath.find_last_of("/\\");
+        std::string s = fpath.substr(lastSlashIndex+1);
+
+        mbr pmbr;
+        FILE* f2 = fopen(path.c_str(),"r+b");
+        fseek(f2,0,SEEK_SET);
+        fread(&pmbr,sizeof (struct mbr),1,f2);
+
+
+        std::string g = " <table border=\"0\" cellborder=\"1\" cellpadding=\"8\">\n";
+
+        int index=0;
+        int t=0;
+
+
+
+        QVector<block>* espacios = new QVector<block>();
+        char vacio[1025];
+        memset(vacio,'0',1024);
+        vacio[1024] = '\0';
+
+
+        //Algoritmo para buscar espacios libres
+
+        //Itera todo el disco
+        for(int i=sizeof (mbr);i<pmbr.mbr_tamano;i+=1024){
+            //std::cout<<i<<std::endl;
+            fseek(f2, i,SEEK_SET);
+            char bloque[1025];
+            size_t readS = fread(bloque,1,1024,f2);
+            fflush(f2);
+            bloque[1024] = '\0';
+            //std::cout<<bloque<<std::endl;
+            if(strcmp(bloque,vacio)==0){
+                //Si se leyo el arreglo completo
+                if(readS==(size_t)1024){
+
+                    if(t==0){
+                        index = i;
+                    }
+                    t += 1024;
+                }else{
+                    if(t==0){
+                        index = i;
+                    }
+                    t += (int)readS;
+                }
+            } else {
+                if(t==0){
+
+                }else{
+                    block nuevo;
+                    nuevo.size = t;
+                    nuevo.inicio = index;
+                    nuevo.t = 'e';
+                    espacios->append(nuevo);
+                    t = 0;
+                }
+
+            }
+        }
+
+        fclose(f2);
+
+        //agrega el ultimo espacio vacio a la lista
+        if(t>0){
+            block nuevo;
+            nuevo.size = t;
+            nuevo.inicio = index;
+            nuevo.t = 'e';
+            espacios->append(nuevo);
+            t = 0;
+        }
+
+
+        //agrega las particiones a la lista de bloques
+        for(partition p : pmbr.mbr_partition){
+            if(!p.empty){
+                block b;
+                b.t = 'p';
+                if(p.part_type=='E'){
+                    b.t = 'x';
+                    primer_ebr = p.part_start;
+                }
+                b.size = p.part_size;
+                b.inicio = p.part_start;
+                strcpy(b.name,p.part_name);
+                espacios->append(b);
+            }
+        }
+
+
+        g += " \t<tr><td colspan=\"";
+        g += std::to_string(espacios->size()+1);
+        g += "\"><b>";
+        g += s;
+        g += "</b></td></tr>\n";
+
+        g += " \t<tr>";
+        g += "<td><b>MBR</b></td>";
+
+        //ordena la lista de bloques por su punto de inicio ascendentemente
+        std::sort(espacios->begin(), espacios->end(), ordenInicio);
+
+        for(block e: *espacios){
+
+            std::string n = e.name;
+            g += "<td>";
+            if(e.t=='e'){
+                g += "<b>Libre</b><br></br>";
+                float percent = ((float)e.size/(float)pmbr.mbr_tamano)*100;
+
+                g += std::to_string(percent);
+                g += "%";
+            }else if(e.t=='p'){
+                g += "<b>";
+                g += e.name;
+                g += "</b><br></br>";
+                float percent = ((float)e.size/(float)pmbr.mbr_tamano)*100;
+
+                g += std::to_string(percent);
+                g += "%";
+            }else if(e.t=='x'){
+                int ocupado = 0;
+                std::string g1;
+                if(primer_ebr!=-1){
+                    g1 += " \t\t<tr>";
+                    ebr pebr;
+                    FILE* f4 = fopen(path.c_str(),"r+b");
+                    fseek(f4,primer_ebr,SEEK_SET);
+                    fread(&pebr,sizeof(ebr),1,f4);
+
+                    ebr *pebr2;
+                    ebr p = pebr;
+
+                    int col = 1;
+
+                    while(p.part_next!=-1){
+                        g1 += "<td><b>EBR</b></td>";
+                        g1 += "<td><b>";
+                        g1 += p.part_name;
+                        g1 += "</b><br></br>";
+                        float percent = ((float)p.part_size/(float)pmbr.mbr_tamano)*100;
+                        g1 += std::to_string(percent);
+                        g1 += "%</td>";
+                        col++;
+                        ocupado += p.part_size;
+                        pebr2 = &p;
+                        fseek(f4,pebr2->part_next,SEEK_SET);
+                        fread(&p,sizeof(struct ebr),1,f4);
+                    }
+
+                    if(p.part_status=='1'){
+                        g1 += "<td><b>EBR</b></td>";
+                        g1 += "<td><b>";
+                        g1 += p.part_name;
+                        g1 += "</b><br></br>";
+                        float percent = ((float)p.part_size/(float)pmbr.mbr_tamano)*100;
+
+                        g1 += std::to_string(percent);
+                        g1 += "%</td>";
+                        ocupado += p.part_size;
+
+                    }else{
+
+                        g1 += "<td><b>EBR</b></td>";
+                    }
+
+                    if(ocupado<e.size){
+                        g1 += "<td><b>Libre</b><br></br>";
+                        g1 += std::to_string(((float)(e.size-ocupado)/(float)pmbr.mbr_tamano)*100);
+                        g1 += "%</td>";
+                        ocupado = 1;
+                    }else{
+                        ocupado = 0;
+                    }
+
+                    g1 += "</tr>\n";
+
+
+                    g += " \n\t<table border=\"0\" cellborder=\"1\" cellpadding=\"8\">\n";
+                    g += " \t\t<tr><td colspan=\"";
+                    g += std::to_string(col*2+ocupado);
+                    g += "\"><b>Extendida";
+                    g += "</b></td></tr>\n";
+                    g += g1;
+                    g += " \t</table>\n";
+                }
+            }
+            g += "</td>";
+        }
+            g += " </tr>\n";
+
+            graph += g;
+            graph += " </table>\n >];\n}";
+
+
+            std::ofstream myfile;
+            std::string myf = "disk";
+            myf += std::to_string(contRep++);
+            myf += ".dot";
+            myfile.open(myf);
+            myfile << graph;
+            myfile.close();
+            std::string sys = "dot -T";
+            sys += ext;
+            sys += " ";
+            sys += myf;
+            sys += " -o ";
+            sys += pRep;
+            system(sys.c_str());
+            sleep(1);
+
+    }
+}
+
+inline bool ordenInicio(const block b1, const block b2)
+{
+    return b1.inicio < b2.inicio;
+}
+
+void eliminarParticion(const char* del_, const char* name, const char* path){
+    std::string sl = del_;
+    transform(sl.begin(), sl.end(), sl.begin(), ::tolower);
+    if(strcmp(sl.c_str(),"full")!=0&&strcmp(sl.c_str(),"fast")!=0){
+        std::cout<<"Error metodo de eliminacion incorrecto"<<std::endl;
+        return;
+    }
+    block part = getParticion(path,name);
+
+    if(part.t=='0'){
+        std::cout<<"Error no existe la particion"<<std::endl;
+    }else if(part.t=='p'){
+        FILE* f3 = fopen(path,"r+b");
+        int size = part.size;
+        if(size<1024){
+            size = 1024;
+        }
+        char vacio[1024];
+        memset(vacio,'0',1024);
+        for(int i=0; i<(size/1024);i++){
+
+            fseek(f3,part.inicio+(i*1024),SEEK_SET);
+            fwrite(&vacio,1024,1,f3);
+
+        }
+        fclose(f3);
+        std::cout<<"Particion eliminada con el metodo "<<del_<<std::endl;
+        crearRaid(path);
+    }else if(part.t=='l'){
+        std::cout<<"Esta version no soporta la eliminacion de particiones logicas :("<<std::endl;
+    }
 }
 
 void addSizeparticion(){
@@ -720,34 +1064,39 @@ void addSizeparticion(){
 }
 
 void mountParticion(const char* path, const char* name){
+    std::cout<<path<<" "<<name<<std::endl;
+
     if(exists(path)==0){
         std::cout << "Error: no existe el disco" <<std::endl;
         return;
     }
     if(!existeParticion(path,name)){
-        std::cout << "Error: no ya existe la particion" <<std::endl;
+        std::cout << "Error: no existe la particion" <<std::endl;
         return;
     }
     std::string ruta = path;
     std::string id = "vd";
-    char newId = estaMontadoDisk(path);
-    if(newId==' '){
+    int newd = estaMontadoDisk(path);
+    if(newd==-1){
         if(discosMont->size()==0)
             letraDisk = 97;
         mDisk md;
         strcpy(md.disk_p,path);
         md.id = (char)letraDisk++;
         id += md.id;
+        id += "1";
+        md.count = 2;
         discosMont->append(md);
     }else{
-        id += newId;
+        mDisk *mdk = &(*(discosMont))[newd];
+        id += mdk->id;
+        id += std::to_string(mdk->count);
+        mdk->count = mdk->count+1;
     }
 
-    int pm = 1;
     for(mPart p : *montadas){
         std::string r = p.disk_p;
         if(ruta==r){
-            pm++;
             if(strcmp(p.nombre,name)==0){
                 std::cout<<"Error ya esta montada la particion"<<std::endl;
                 return;
@@ -755,7 +1104,6 @@ void mountParticion(const char* path, const char* name){
         }
     }
 
-    id += std::to_string(pm);
     mPart mp;
     strcpy(mp.id,id.c_str());
     strcpy(mp.disk_p,path);
@@ -764,16 +1112,18 @@ void mountParticion(const char* path, const char* name){
     std::cout<<"Particion montada con id: "<<mp.id<<std::endl;
 }
 
-char estaMontadoDisk(const char* path){
+int estaMontadoDisk(const char* path){
+
     std::string ruta = path;
+    int i=0;
     for(mDisk d : *discosMont){
         std::string discP = d.disk_p;
         if(discP==ruta){
-
-            return d.id;
+            return i;
         }
+        i++;
     }
-    return ' ';
+    return -1;
 }
 
 void unmountParticion(const char* id){
@@ -784,11 +1134,28 @@ void unmountParticion(const char* id){
         if(mpid==strid){
             montadas->remove(i);
             std::cout<<"Particion desmontada con id: "<<mpid<<std::endl;
+            if(montadas->size()==0){
+                discosMont->clear();
+            }
             return;
         }
     }
 
     std::cout<<"Error la particion no esta montada"<<std::endl;
+}
+
+std::string diskPathParticion(const char* id){
+    std::string strid = id;
+    for(int i=0;i<montadas->size();i++){
+        mPart mp = montadas->at(i);
+        std::string mpid = mp.id;
+        if(mpid==strid){
+            return mp.disk_p;
+        }
+    }
+
+    std::cout<<"Error la particion no esta montada"<<std::endl;
+    return "";
 }
 
 bool existeParticion(const char* path, const char *name){
@@ -838,3 +1205,77 @@ bool existeParticion(const char* path, const char *name){
     return false;
 }
 
+block getParticion(const char* path, const char *name){
+    block bl;
+    bl.t = '0';
+    if(exists(path)==0){
+
+        return bl;
+    }
+    int primer_ebr = -1;
+    mbr pmbr;
+    FILE* f2 = fopen(path,"r+b");
+    fseek(f2,0,SEEK_SET);
+    fread(&pmbr,sizeof (struct mbr),1,f2);
+    fclose(f2);
+    partition *delP;
+    int x =0;
+    for(partition p : pmbr.mbr_partition){
+        if(p.part_type=='E'){
+            primer_ebr = p.part_start;
+        }
+        if(strcmp(p.part_name,name)==0){
+            bl.t = 'p';
+            bl.size = p.part_size;
+            bl.inicio = p.part_start;
+            FILE* f3 = fopen(path,"r+b");
+            fseek(f3,0,SEEK_SET);
+            delP = &pmbr.mbr_partition[x];
+            delP->empty = true;
+            delP->part_fit = ' ';
+            char nnnn[20] = " ";
+            strcpy(delP->part_name, nnnn);
+            delP->part_size = 0;
+            delP->part_type = ' ';
+            delP->part_start = 0;
+            delP->part_status = 1;
+            fwrite(&pmbr,sizeof (struct mbr),1,f3);
+            fclose(f3);
+            return bl;
+        }
+        x++;
+    }
+
+    if(primer_ebr!=-1){
+        ebr pebr;
+        FILE* f4 = fopen(path,"r+b");
+        fseek(f4,primer_ebr,SEEK_SET);
+        fread(&pebr,sizeof(ebr),1,f4);
+
+        ebr *pebr2;
+        ebr p = pebr;
+
+        while(p.part_next!=-1){
+            if(strcmp(p.part_name,name)==0){
+                fclose(f4);
+                bl.t = 'l';
+                bl.inicio = p.part_start;
+                bl.size = p.part_size;
+                return bl;
+            }
+            pebr2 = &p;
+            fseek(f4,pebr2->part_next,SEEK_SET);
+            fread(&p,sizeof(struct ebr),1,f4);
+        }
+        if(strcmp(p.part_name,name)==0){
+            fclose(f4);
+            bl.t = 'l';
+            bl.inicio = p.part_start;
+            bl.size = p.part_size;
+            return bl;
+        }
+
+        fclose(f4);
+    }
+    return bl;
+}

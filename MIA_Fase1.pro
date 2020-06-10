@@ -7,6 +7,7 @@ HEADERS += \
     disco.h \
     gram.tab.h \
     union.h
+
 SOURCES += \
     disco.cpp \
     gram.tab.c \

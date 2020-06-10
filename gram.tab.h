@@ -49,29 +49,31 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    mkdisk = 258,
-    rmdisk = 259,
-    fdisk = 260,
-    mount = 261,
-    unmount = 262,
-    rep = 263,
-    size = 264,
-    unit = 265,
-    path = 266,
-    fit = 267,
-    type = 268,
-    name = 269,
-    del = 270,
-    add = 271,
-    id = 272,
-    cadena = 273,
-    identifier = 274,
-    ruta = 275,
-    num = 276,
-    guion = 277,
-    igual = 278,
-    exit_ = 279,
-    exec = 280
+    yes = 258,
+    no = 259,
+    mkdisk = 260,
+    rmdisk = 261,
+    fdisk = 262,
+    mount = 263,
+    unmount = 264,
+    rep = 265,
+    size = 266,
+    unit = 267,
+    path = 268,
+    fit = 269,
+    type = 270,
+    name = 271,
+    del = 272,
+    add = 273,
+    id = 274,
+    cadena = 275,
+    identifier = 276,
+    ruta = 277,
+    num = 278,
+    guion = 279,
+    igual = 280,
+    exit_ = 281,
+    exec = 282
   };
 #endif
 
@@ -79,12 +81,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 21 "gram.y"
-
+#line 36 "gram.y"
 
 char* TEXT;
 
-#line 88 "gram.tab.h"
+#line 89 "gram.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -98,10 +99,11 @@ extern YYSTYPE yylval;
 int yyparse (void);
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
-int func();
+#endif
+extern int func(void);
 #ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
+}
+#endif
+
 
 #endif /* !YY_YY_GRAM_TAB_H_INCLUDED  */
